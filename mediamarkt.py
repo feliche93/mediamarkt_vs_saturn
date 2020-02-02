@@ -1,3 +1,4 @@
+import csv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
@@ -5,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+import pandas as pd
 
 
 driver = webdriver.Chrome(
@@ -23,7 +25,7 @@ categories = driver.find_elements_by_xpath(
 
 category_urls = []
 
-counter = len(categories) + 1
+counter = len(categories)
 e = 0
 
 while e < counter:
@@ -31,19 +33,23 @@ while e < counter:
         '//li[@class="category-list__element"]')
     driver.implicitly_wait(10)
     categories[e].click()
-    category_url = driver.current_url
-    category_urls.append(category_url)
-    driver.get('https://www.mediamarkt.de')
-    driver.find_element_by_xpath(
-        '//button[@class="mms-button-v2 mms-button-v2--size-s mms-button-v2--type-secondary categories-button"]').click()
-    e += 1
+category_url = driver.current_url
+category_urls.append(category_url)
+driver.get('https://www.mediamarkt.de')
+driver.find_element_by_xpath(
+    '//button[@class="mms-button-v2 mms-button-v2--size-s mms-button-v2--type-secondary categories-button"]').click()
+e += 1
+
+start_urls = pd.DataFrame({'start_urls': category_urls})
+
+start_urls.to_csv('start_urls.csv')
 
 
 class Mediamarkt():
 
     def __init__(self, executable_path, start_url):
         self.executable_path = executable_path
-        self.driver = driver = webdriver.Chrome(
+        self.driver = webdriver.Chrome(
             executable_path=self.executable_path)
         self.start_url = start_url
 
